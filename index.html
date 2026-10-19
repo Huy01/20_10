@@ -441,6 +441,7 @@
     </style>
   </head>
   <body>
+    <audio id="music" preload="none"></audio>
     <div class="glow g1"></div>
     <div class="glow g2"></div>
 
@@ -492,6 +493,31 @@
           : 0;
       const R = (a, b) => Math.random() * (b - a) + a;
       const $ = (id) => document.getElementById(id);
+
+      const music = $("music");
+      let musicStarting = false,
+        musicStarted = false;
+      music.src = "assets/music/ShortKit-audio.mp3";
+      music.loop = true;
+      music.volume = 0.7;
+      music.addEventListener("error", () => {
+        console.error(`Không thể tải nhạc: ${music.currentSrc}`, music.error);
+      });
+
+      async function startMusic() {
+        if (musicStarted || musicStarting) return;
+        musicStarting = true;
+        try {
+          await music.play();
+          musicStarted = true;
+          document.removeEventListener("pointerdown", startMusic);
+        } catch (error) {
+          console.warn("Không thể bắt đầu phát nhạc.", error);
+        } finally {
+          musicStarting = false;
+        }
+      }
+      document.addEventListener("pointerdown", startMusic);
 
       for (let i = 0; i < 60; i++) {
         const s = document.createElement("div");
